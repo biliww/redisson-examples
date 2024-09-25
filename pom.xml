@@ -90,7 +90,7 @@
                     <source>${source.version}</source>
                     <target>${source.version}</target>
                     <optimize>true</optimize>
-                    <showDeprecations>true</showDeprecations>
+<!--                    <showDeprecations>true</showDeprecations>-->
                 </configuration>
                 <executions>
                     <execution>

@@ -18,28 +18,34 @@ package org.redisson.example.objects;
 import org.redisson.Redisson;
 import org.redisson.api.RAtomicDouble;
 import org.redisson.api.RedissonClient;
+import org.redisson.config.Config;
 
 public class AtomicDoubleExamples {
 
     public static void main(String[] args) {
         // connects to 127.0.0.1:6379 by default
-        RedissonClient redisson = Redisson.create();
+        Config config = new Config();
+        config.useSingleServer().setAddress("redis://127.0.0.1:6379")
+                .setPassword("123456")
+                .setDatabase(2);
+
+        RedissonClient redisson = Redisson.create(config);
 
         RAtomicDouble atomicDouble = redisson.getAtomicDouble("myDouble");
         atomicDouble.getAndDecrement();
         atomicDouble.getAndIncrement();
-        
+
         atomicDouble.addAndGet(10.323);
         atomicDouble.compareAndSet(29.4, 412.91);
-        
+
         atomicDouble.decrementAndGet();
         atomicDouble.incrementAndGet();
-        
+
         atomicDouble.getAndAdd(302.00);
         atomicDouble.getAndDecrement();
         atomicDouble.getAndIncrement();
-        
+
         redisson.shutdown();
     }
-    
+
 }

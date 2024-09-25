@@ -27,48 +27,54 @@ import org.redisson.api.LocalCachedMapOptions;
 import org.redisson.api.RedissonClient;
 import org.redisson.api.LocalCachedMapOptions.EvictionPolicy;
 import org.redisson.api.RLocalCachedMap;
+import org.redisson.config.Config;
 
 public class LocalCachedMapExamples {
 
     public static void main(String[] args) {
         // connects to 127.0.0.1:6379 by default
-        RedissonClient redisson = Redisson.create();
-        
+        Config config = new Config();
+        config.useSingleServer().setAddress("redis://127.0.0.1:6379")
+                .setPassword("123456")
+                .setDatabase(2);
+
+        RedissonClient redisson = Redisson.create(config);
+
         LocalCachedMapOptions options = LocalCachedMapOptions.defaults()
                 .cacheSize(10000)
                 .evictionPolicy(EvictionPolicy.LRU)
                 .maxIdle(10, TimeUnit.SECONDS)
                 .timeToLive(60, TimeUnit.SECONDS);
-                
+
         RLocalCachedMap<String, Integer> cachedMap = redisson.getLocalCachedMap("myMap", options);
         cachedMap.put("a", 1);
         cachedMap.put("b", 2);
         cachedMap.put("c", 3);
-        
+
         boolean contains = cachedMap.containsKey("a");
-        
+
         Integer value = cachedMap.get("c");
         Integer updatedValue = cachedMap.addAndGet("a", 32);
-        
+
         Integer valueSize = cachedMap.valueSize("c");
-        
-        Set<String> keys = new HashSet<String>();
-        keys.add("a");
-        keys.add("b");
-        keys.add("c");
-        Map<String, Integer> mapSlice = cachedMap.getAll(keys);
-        
-        // use read* methods to fetch all objects
-        Set<String> allKeys = cachedMap.readAllKeySet();
-        Collection<Integer> allValues = cachedMap.readAllValues();
-        Set<Entry<String, Integer>> allEntries = cachedMap.readAllEntrySet();
-        
-        // use fast* methods when previous value is not required
-        boolean isNewKey = cachedMap.fastPut("a", 100);
-        boolean isNewKeyPut = cachedMap.fastPutIfAbsent("d", 33);
-        long removedAmount = cachedMap.fastRemove("b");
-        
+//
+//        Set<String> keys = new HashSet<String>();
+//        keys.add("a");
+//        keys.add("b");
+//        keys.add("c");
+//        Map<String, Integer> mapSlice = cachedMap.getAll(keys);
+//
+//        // use read* methods to fetch all objects
+//        Set<String> allKeys = cachedMap.readAllKeySet();
+//        Collection<Integer> allValues = cachedMap.readAllValues();
+//        Set<Entry<String, Integer>> allEntries = cachedMap.readAllEntrySet();
+//
+//        // use fast* methods when previous value is not required
+//        boolean isNewKey = cachedMap.fastPut("a", 100);
+//        boolean isNewKeyPut = cachedMap.fastPutIfAbsent("d", 33);
+//        long removedAmount = cachedMap.fastRemove("b");
+
         redisson.shutdown();
     }
-    
+
 }

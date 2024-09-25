@@ -21,27 +21,35 @@ import org.redisson.Redisson;
 import org.redisson.api.RTopic;
 import org.redisson.api.RedissonClient;
 import org.redisson.api.listener.MessageListener;
+import org.redisson.config.Config;
 
 public class TopicExamples {
 
     public static void main(String[] args) throws InterruptedException {
         // connects to 127.0.0.1:6379 by default
-        RedissonClient redisson = Redisson.create();
+        Config config = new Config();
+        config.useSingleServer().setAddress("redis://127.0.0.1:6379")
+                .setPassword("123456")
+                .setDatabase(2);
+
+        RedissonClient redisson = Redisson.create(config);
 
         CountDownLatch latch = new CountDownLatch(1);
-        
+
         RTopic topic = redisson.getTopic("topic2");
         topic.addListener(String.class, new MessageListener<String>() {
             @Override
             public void onMessage(CharSequence channel, String msg) {
+
+                System.out.println("redis-msg:"+msg);
                 latch.countDown();
             }
         });
-        
-        topic.publish("msg");
+
+        topic.publish("msg2");
         latch.await();
-        
+
         redisson.shutdown();
     }
-    
+
 }
